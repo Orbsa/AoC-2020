@@ -1,4 +1,4 @@
-
+import re
 
 def read(filename):
     with open(filename, "r") as a_file:
@@ -50,14 +50,72 @@ def day3(p2 = False):
         while curPos[0] < len(hillMap): # Break loop if outside hillMap
             if hillMap[curPos[0]][curPos[1]%mWidth]=='#':
                 treesHit += 1
-            #curPos= list(hillMap(sum,zip(curPos,slope)))  #  Not sure why this bit fails
+            #curPos= list(map(sum,zip(curPos,slope)))  #  Not sure why this bit fails
             curPos[0] += slope[0]
             curPos[1] += slope[1]
         totalTreesHit *= treesHit
     return totalTreesHit
+    
+
+def day4(p2 = False):
+    passport = {
+    "byr": None,
+    "iyr": None,
+    "eyr": None,
+    "hgt": None,
+    "hcl": None,
+    "ecl": None,
+    "pid": None,
+    "cid": 0, # Ignore none input for this field
+    "filledOut": False,
+    "valid": False
+    }
+    
+    # Limited Lambda helpers
+    cmin = {
+    "cm": (lambda hgt: 150 <= int(hgt) <= 193),
+    "in": (lambda hgt: 59 <= int(hgt) <= 76)
+    }
+    ppValidations = {
+    "byr": (lambda data: 1920 <= int(data) <= 2002),
+    "iyr": (lambda data: 2010 <= int(data) <= 2020),
+    "eyr": (lambda data: 2020 <= int(data) <= 2030),
+    "hgt": (lambda data: bool(re.search("^\d+(cm|in)$", data)) and cmin[data[-2:]](data[:-2])),
+    "hcl": (lambda data: bool(re.search("^#[a-f0-9]{6}$", data))),
+    "ecl": (lambda data: data in "amb blu brn gry grn hzl oth".split()), # Is this bad practice? too lazy for commas
+    "pid": (lambda data: bool(re.search("^\d{9}$", data))),
+    "cid": (lambda data: True), # Ignore none input for this field',
+    "filledOut": (lambda data: data), # Pass along
+    "valid": (lambda data: True) # Assume True for check
+    }
+    
+    ppList = []
+    ppLines = read("day4.in")
+    pp = passport.copy()
+    for ppLine in ppLines:
+        if ppLine == "" or ppLine == "\n":
+            if not any([x is None for x in pp.values()]):
+                pp['filledOut'] = True
+                pp["valid"] = all([ppValidations[key](pp[key]) for key in [*pp]]) # List comprehension lambda bash
+                print([ppValidations[key](pp[key]) for key in [*pp]])
+            
+            ppList.append(pp) # Append Current Dict
+            pp = passport.copy() # Reset Dict to default
+            continue
+        for id,key in [x.split(':') for x in [keyCombo for keyCombo in ppLine.split()]]:
+            try: pp[id] = key
+            except: print("ERROR: UNEXPECTED INPUT:"+(id,key)) # Shouldn't happen?
+    filledOut = len([pp for pp in ppList if pp["filledOut"]])
+    valid = len([pp for pp in ppList if pp["valid"]])
+    #invalid = len(ppList) - valid
+    
+    return (filledOut, valid)
+     #ToDO: Filter Keys to better variable types
+    
+    
 
 def main():
-    print(day3(True))
+    print(day4(True))
 
 if __name__=="__main__":
     main()
