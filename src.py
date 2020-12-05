@@ -113,9 +113,40 @@ def day4(p2 = False):
      #ToDO: Filter Keys to better variable types
     
     
+def day5(p2 = False):
+    ROWS=128
+    COLUMNS=8
+    rules = { # Should have just done a binary coversion for this
+    "F": (lambda set: (set[0], int(set[1]-(set[1]-set[0])/2), set[2], set[3])),
+    "B": (lambda set: (int(set[0]+(set[1]-set[0])/2), set[1], set[2], set[3])),
+    "L": (lambda set: (set[0], set[1], set[2], int(set[3]-(set[3]-set[2])/2))),
+    "R": (lambda set: (set[0], set[1], int(set[2]+(set[3]-set[2])/2), set[3])),
+    }
+    seatChart= read('day5.in')
+    seatsTaken=[]
+    seatsTakenMap= [[False for x in range(ROWS)] for y in range(COLUMNS)]
+    for seatKey in seatChart:
+        lower = 0
+        upper= ROWS
+        lefter=0
+        righter=COLUMNS
+        for char in seatKey: lower,upper,lefter,righter = rules[char]((lower,upper,lefter,righter))
+        seat = (lefter,lower) # (Column, Row)
+        seatID= seat[1]*8+seat[0]
+        seatsTaken.append(seatID)
+        try: seatsTakenMap[lefter][lower]= True
+        except: print(lefter,lower)
+    
+    if not p2: 
+        return(max(seatsTaken))
+    openSeats = [(x,y) for x in range(COLUMNS) for y in range(ROWS) if not seatsTakenMap[x][y] and 0 < y < ROWS]
+    for x,y in openSeats:
+         seatID = y*8+x
+         if seatID+1 in seatsTaken and seatID-1 in seatsTaken:
+            return(seatID)
 
 def main():
-    print(day4(True))
+    print(day5(True))
 
 if __name__=="__main__":
     main()
