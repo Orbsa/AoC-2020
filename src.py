@@ -145,8 +145,23 @@ def day5(p2 = False):
          if seatID+1 in seatsTaken and seatID-1 in seatsTaken:
             return(seatID)
 
+
+def listAndSet(listIn):
+        xSet = set(listIn[0])
+        for x in listIn: xSet &= set(x)
+        return xSet
+def day6(p2 = False):
+    answers= read('day6.in')
+    if not p2:
+        groupSets = [set("".join(group.split("\n"))) for group in '\n'.join(answers).split("\n\n")]
+    else: 
+        groupSets = [listAndSet(group.split("\n")) for group in '\n'.join(answers).split("\n\n")]
+    return sum(list(map(lambda l: len(l), groupSets)))
+
+
+
 def main():
-    print(day5(True))
+    print(day6(True))
 
 if __name__=="__main__":
     main()
