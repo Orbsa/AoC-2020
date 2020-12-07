@@ -159,9 +159,39 @@ def day6(p2 = False):
     return sum(list(map(lambda l: len(l), groupSets)))
 
 
+def CICSG(bags, color):
+    # Check if Contains Shiny Gold bag
+    for color in bags[color].keys():
+        if color == "shiny gold" or CICSG(bags, color): return True
+    return False
+def totalBags(bags, color):
+    total = 1 # For the bag itself
+    curBag = bags[color]
+    for colors in curBag.keys():
+        total += curBag[colors] * totalBags(bags,colors)
+    return total
+def day7(p2= False):
+    bags = dict()
+    for line in read("day7.in"):
+        bagName = re.split('bags?', line)[0]
+        container = dict()
+        bagColor = re.split(' bags contains?', line)[0]
+        contains = re.split('contains? ', line)[1][:-1].split(', ')
+        for x in contains:
+            try:
+                curCount= int(re.search("^\d+", x)[0])
+                curColor= ' '.join(re.split(" bags?", x)[0].split()[1:])
+                container[curColor]=curCount
+            except: pass # Pass on empty bags
+        bags[bagColor]= container
+    if not p2:
+        goldenBags = [color for color in bags if CICSG(bags,color)]
+        return(len(goldenBags))
+    return totalBags(bags, 'shiny gold')-1
+        
 
 def main():
-    print(day6(True))
+    print(day7(True))
 
 if __name__=="__main__":
     main()
