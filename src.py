@@ -188,10 +188,76 @@ def day7(p2= False):
         goldenBags = [color for color in bags if CICSG(bags,color)]
         return(len(goldenBags))
     return totalBags(bags, 'shiny gold')-1
+
+
+def continueInstructions(i, instructions, iVisited, accumulator):
+        curVisited = iVisited
+        curAccumulator= accumulator 
+        while i < len(instructions):
+            if i in iVisited: # End p1
+                return curVisited
+            curVisited.append(i)
+            op, dig = instructions[i].split()
+            if op == 'nop':
+                pass
+            elif op == 'acc': 
+                curAccumulator += int(dig)
+            elif op =='jmp':
+                i += int(dig)
+                continue
+            i+=1
+        accumulator = curAccumulator
+        print(accumulator)
+        return False # P2 completes
+def day8(p2 = False):
+    instructions = read('day8.in')
+    iVisited = [] 
+    i=0
+    accumulator = 0
+    iVisited = continueInstructions(i, instructions, iVisited, accumulator)
+    if not p2: return accumulator
+    for index in iVisited[::-1]:
+        i = index
+        print(iVisited, i)
+        iVisited=iVisited[:-1]
+        op, dig = instructions[i].split()
+        if op == 'nop': op = 'jmp'
+        elif op == 'jmp': op = 'nop'
+        else: continue
+        instructions[i]=' '.join([op,dig])
+        if not continueInstructions(i, instructions, iVisited, accumulator):
+            return accumulator
+
+def day9(p2 = False):
+    xmas = [int(x) for x in read('day9.in')]
+    invalid = 0
+    for i in range(25,len(xmas)): # Start at 25
+        preamb = xmas[i-25:i] # preamb = [0...24]
+        matchFound = False
+        for j in preamb: # preamb iteration
+            r = xmas[i]-j
+            if r == j: 
+                if preamb.count(j) > 1: matchFound = True
+                else: continue
+            if r in preamb: matchFound = True
+        if not matchFound:
+            invalid = xmas[i]
+            if not p2: return invalid
+            break
+    for i in range(len(xmas)):
+        j=i+1
+        cSet= xmas[i:j]
+        while sum(cSet) <= invalid:
+            if sum(cSet) == invalid: return min(cSet)+max(cSet)
+            j+=1
+            cSet = xmas[i:j]
+
+
         
 
+
 def main():
-    print(day7(True))
+    print(day9(True))
 
 if __name__=="__main__":
     main()
