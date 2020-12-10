@@ -253,11 +253,39 @@ def day9(p2 = False):
             cSet = xmas[i:j]
 
 
-        
+def nPermutations(sets,i):
+    if i == len(sets)-1: return 1 
+    j = i+1
+    nPossible = []
+    tPermutations = 0 
+    while j < len(sets) and sets[j]-sets[i] < 4:
+        tPermutations+=nPermutations(sets,j)
+        j+=1
+        #if tPermutations >= 1000: print(tPermutations)
+    return tPermutations
+    
 
+    # Return [[i,j,...z][i,j+1,...z]]
+
+def day10(p2 = False):
+    adapters = [int(x) for x in read('day10.in')]
+    adapters.sort()
+    if not p2:
+        differences={1:0, 2:0, 3:1}
+        for i in range(len(adapters)):
+            last = adapters[i-1] if i>0 else 0
+            cur = adapters[i]
+            differences[cur-last]+=1
+        return differences[1]*differences[3]
+    permList = [len([j for j in adapters[i+1:i+4] if j-adapters[i]<4]) for i in range(len(adapters)-1)]
+    print(permList)
+    pCount=1
+    for x in permList:
+        pCount*=x
+    return pCount
 
 def main():
-    print(day9(True))
+    print(day10(True))
 
 if __name__=="__main__":
     main()
