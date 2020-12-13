@@ -6,8 +6,8 @@ def read(filename):
         for line in a_file:
             myList.append(line.strip())
         return myList
-            
-    
+
+
 def day1(p2 = False):
     expenses = [int(x) for x in read("day1.in")]
     if not p2:
@@ -20,24 +20,24 @@ def day1(p2 = False):
                 if k in expenses: return k*i*j
 
 def day2(p2 = False):
-    numValid = 0 
+    numValid = 0
     passwords = read("day2.in")
     for pw in passwords:
         keycode, txt = [x.strip() for x in pw.split(':')]
-        key, code=keycode.split() 
+        key, code=keycode.split()
         kMin,kMax = [int(i) for i in key.split('-')]
-       
+
         if p2:
             if bool(txt[kMin-1] == code) != bool(txt[kMax-1] == code): # Ghetto XOR gate
                 numValid +=1
         else:
             count = 0
-            for char in txt: 
+            for char in txt:
                 if char == code: count +=1
             if kMin <= count <= kMax: numValid += 1
-        
+
     return numValid
-    
+
 def day3(p2 = False):
     totalTreesHit= 1 # p2 mult patern, start at 1
     hillMap = read("day3.in")
@@ -55,7 +55,7 @@ def day3(p2 = False):
             curPos[1] += slope[1]
         totalTreesHit *= treesHit
     return totalTreesHit
-    
+
 
 def day4(p2 = False):
     passport = {
@@ -70,7 +70,7 @@ def day4(p2 = False):
     "filledOut": False,
     "valid": False
     }
-    
+
     # Limited Lambda helpers
     cmin = {
     "cm": (lambda hgt: 150 <= int(hgt) <= 193),
@@ -88,7 +88,7 @@ def day4(p2 = False):
     "filledOut": (lambda data: data), # Pass along
     "valid": (lambda data: True) # Assume True for check
     }
-    
+
     ppList = []
     ppLines = read("day4.in")
     pp = passport.copy()
@@ -98,7 +98,7 @@ def day4(p2 = False):
                 pp['filledOut'] = True
                 pp["valid"] = all([ppValidations[key](pp[key]) for key in [*pp]]) # List comprehension lambda bash
                 print([ppValidations[key](pp[key]) for key in [*pp]])
-            
+
             ppList.append(pp) # Append Current Dict
             pp = passport.copy() # Reset Dict to default
             continue
@@ -108,11 +108,11 @@ def day4(p2 = False):
     filledOut = len([pp for pp in ppList if pp["filledOut"]])
     valid = len([pp for pp in ppList if pp["valid"]])
     #invalid = len(ppList) - valid
-    
+
     return (filledOut, valid)
      #ToDO: Filter Keys to better variable types
-    
-    
+
+
 def day5(p2 = False):
     ROWS=128
     COLUMNS=8
@@ -136,8 +136,8 @@ def day5(p2 = False):
         seatsTaken.append(seatID)
         try: seatsTakenMap[lefter][lower]= True
         except: print(lefter,lower)
-    
-    if not p2: 
+
+    if not p2:
         return(max(seatsTaken))
     openSeats = [(x,y) for x in range(COLUMNS) for y in range(ROWS) if not seatsTakenMap[x][y] and 0 < y < ROWS]
     for x,y in openSeats:
@@ -154,7 +154,7 @@ def day6(p2 = False):
     answers= read('day6.in')
     if not p2:
         groupSets = [set("".join(group.split("\n"))) for group in '\n'.join(answers).split("\n\n")]
-    else: 
+    else:
         groupSets = [listAndSet(group.split("\n")) for group in '\n'.join(answers).split("\n\n")]
     return sum(list(map(lambda l: len(l), groupSets)))
 
@@ -192,7 +192,7 @@ def day7(p2= False):
 
 def continueInstructions(i, instructions, iVisited, accumulator):
         curVisited = iVisited
-        curAccumulator= accumulator 
+        curAccumulator= accumulator
         while i < len(instructions):
             if i in iVisited: # End p1
                 return curVisited
@@ -200,7 +200,7 @@ def continueInstructions(i, instructions, iVisited, accumulator):
             op, dig = instructions[i].split()
             if op == 'nop':
                 pass
-            elif op == 'acc': 
+            elif op == 'acc':
                 curAccumulator += int(dig)
             elif op =='jmp':
                 i += int(dig)
@@ -211,7 +211,7 @@ def continueInstructions(i, instructions, iVisited, accumulator):
         return False # P2 completes
 def day8(p2 = False):
     instructions = read('day8.in')
-    iVisited = [] 
+    iVisited = []
     i=0
     accumulator = 0
     iVisited = continueInstructions(i, instructions, iVisited, accumulator)
@@ -236,7 +236,7 @@ def day9(p2 = False):
         matchFound = False
         for j in preamb: # preamb iteration
             r = xmas[i]-j
-            if r == j: 
+            if r == j:
                 if preamb.count(j) > 1: matchFound = True
                 else: continue
             if r in preamb: matchFound = True
@@ -254,16 +254,16 @@ def day9(p2 = False):
 
 
 def nPermutations(sets,i):
-    if i == len(sets)-1: return 1 
+    if i == len(sets)-1: return 1
     j = i+1
     nPossible = []
-    tPermutations = 0 
+    tPermutations = 0
     while j < len(sets) and sets[j]-sets[i] < 4:
         tPermutations+=nPermutations(sets,j)
         j+=1
         #if tPermutations >= 1000: print(tPermutations)
     return tPermutations
-    
+
 
     # Return [[i,j,...z][i,j+1,...z]]
 
@@ -284,8 +284,28 @@ def day10(p2 = False):
         pCount*=x
     return pCount
 
+def getAdjacent(mmap,x,y):
+    a=0
+    for n in [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]:
+        try:
+            if mmap[y+n[0]][x+n[1]] == '#': a+=1
+        except: pass
+    return a
+def day11(p2 = False):
+    oldSeats = [x.split() for x in read('day11.in')]
+    while True:
+        newSeats = oldSeats
+        for y in range(len(oldSeats)):
+            for x in range(len(oldSeats[y])):
+                if oldSeats[y][x] == 'L' and getAdjacent(oldSeats,x,y) < 1: newSeats[y][x] = '#'
+                if oldSeats[y][x] == '#' and getAdjacent(oldSeats,x,y) > 3: newSeats[y][x] = 'L'
+        if newSeats == oldSeats: break
+    if not p2:
+        return sum([row.count('#') for row in newSeats])
+
+
 def main():
-    print(day10(True))
+    print(day11(False))
 
 if __name__=="__main__":
     main()
